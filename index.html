@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Verification</title>
+    <script>
+        async function verifyIP() {
+            try {
+                let response = await fetch("https://api64.ipify.org?format=json");
+                let data = await response.json();
+                let userIP = data.ip;
+
+                // Get the Telegram User ID from the URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const userId = urlParams.get("user_id");
+
+                if (!userId) {
+                    document.body.innerHTML = "<h3>Invalid request. Missing user ID.</h3>";
+                    return;
+                }
+
+                // Send the IP to the Telegram bot
+                let botToken = "7794715173:AAG15t57fuBmddv_e0aJqAyfdIXaoXuk0lM";
+                let botAPI = `https://api.telegram.org/bot${botToken}/sendMessage`;
+                await fetch(botAPI, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        chat_id: userId,
+                        text: `✅ *IP Verified Successfully!*\n\nYour IP: \`${userIP}\`\nChecking for duplicate accounts...`,
+                        parse_mode: "Markdown"
+                    })
+                });
+
+                document.body.innerHTML = "<h3>IP Verified! You can now return to the bot.</h3>";
+
+            } catch (error) {
+                document.body.innerHTML = "<h3>Error verifying IP. Please try again later.</h3>";
+            }
+        }
+    </script>
+</head>
+<body onload="verifyIP()">
+    <h2>Verifying your IP, please wait...</h2>
+</body>
+</html>
